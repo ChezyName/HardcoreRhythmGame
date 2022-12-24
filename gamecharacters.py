@@ -28,8 +28,11 @@ class Player:
         self.dead = False
         self.start = time.time()
 
-
     def draw(self,win):
+        pygame.draw.rect(win,self.color,self.rect)
+
+    def reset(self,win):
+        self.start = time.time()
         pygame.draw.rect(win,self.color,self.rect)
 
     def update(self):
@@ -117,13 +120,13 @@ class SQRBlaster():
     def draw(self,win):
         timeElapsed = time.time() - self.start
 
-        if(not(timeElapsed >= 1.4)):
+        if(not(timeElapsed >= 0.6)):
             #Transparency
-            self.alpha = 128*(timeElapsed/1.4)
+            self.alpha = 128*(timeElapsed/0.6)
         else:
             self.die = True
 
-        if(timeElapsed <= 1.45):
+        if(timeElapsed <= 0.65):
             self.rect = pygame.Rect(self.X,self.Y,self.Width,self.Height)
             s = pygame.Surface((self.Width,self.Height))
             s.set_alpha(self.alpha)
@@ -168,13 +171,13 @@ class SQRBlasterAtPos():
     def draw(self,win):
         timeElapsed = time.time() - self.start
 
-        if(not(timeElapsed >= 1.4)):
+        if(not(timeElapsed >= 0.6)):
             #Transparency
-            self.alpha = 128*(timeElapsed/1.4)
+            self.alpha = 128*(timeElapsed/0.6)
         else:
             self.die = True
 
-        if(timeElapsed <= 1.45):
+        if(timeElapsed <= 0.65):
             self.rect = pygame.Rect(self.X,self.Y,self.Width,self.Height)
             s = pygame.Surface((self.Width,self.Height))
             s.set_alpha(self.alpha)

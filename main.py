@@ -51,4 +51,19 @@ os.remove(out_file)
 print("Generating Beatmap...")
 
 generate_beatmap.generateBeatmap(os.path.join(Path,'song.wav'))
-game.playGame()
+
+print("\n\n\n")
+print("Select Diffuculty\n")
+print("1.) Easy")
+print("2.) Medium")
+print("3.) Hard")
+
+def diffuculty():
+    d = int(input(">"))
+    if(d >= 1 and d <= 3):
+        game.playGame(d)
+    else:
+        print("Invalid Diffuculty")
+        diffuculty()
+
+diffuculty()

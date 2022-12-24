@@ -19,7 +19,23 @@ def loadBeatMap():
     BeatMapData = [float(string) for string in text.split('\n') if string != '']
     
 
-def playGame():
+def playGame(d):
+    global diffuculty
+    global maxLineCount
+    
+    if(d == 1):
+        #Easy
+        diffuculty = 1
+        maxLineCount = 4
+    elif(d==2):
+        #Med
+        diffuculty = 3
+        maxLineCount = 2
+    elif(d==3):
+        #Hard
+        maxLineCount = 1
+        diffuculty = 5
+
     print("\n\n\nLoading Up Game Files...\n")
     pygame.init()
     pygame.display.set_caption("HardcoreRhythmGame")
@@ -54,21 +70,54 @@ def playGame():
     #countdown
     updateDisplay()
 
+def restartGame():
+    global StartTime
+    global isDead
+    global music
+    global nextBeat
+
+    for index,Blaster in enumerate(Blasters):
+        del Blasters[index]
+
+    plr.velX = 1280/2
+    plr.velY = 720/2
+    plr.reset(screen)
+
+    pygame.display.update()
+    pygame.display.flip()
+    clock.tick(60)
+
+    music.stop()
+    StartTime = time.time()
+    plr.color = (255,255,255)
+    plr.dead = False
+    isDead = False
+    nextBeat = 0
+
+    song = (os.path.join(Path,"song.wav"))
+    song_sound = pygame.mixer.Sound(song)
+    music = pygame.mixer.Sound.play(song_sound)
+
 Blasters = []
+isDead = False
 
 def updateDisplay():
+    global StartTime
+    global nextBeat
     StartTime = time.time()
     nextBeat = 0
+    global isDead
 
     while True:
         #Clean Screen
         screen.fill((0,0,0))
 
-        TimeElapsed = time.time() - StartTime
+        if(not isDead):
+            TimeElapsed = time.time() - StartTime
 
-        if(nextBeat < len(BeatMapData) and BeatMapData[nextBeat] < TimeElapsed):
-            nextBeat += 1
-            onMusicBeat()
+            if(nextBeat < len(BeatMapData) and BeatMapData[nextBeat] < TimeElapsed):
+                nextBeat += 1
+                onMusicBeat()
 
         #print("Time Elapsed: " + str(BeatMapData[nextBeat])+"----------"+str(TimeElapsed))
 
@@ -83,9 +132,9 @@ def updateDisplay():
                 #print("Player Has Died!")
                 plr.color = (255,0,0)
                 plr.dead = True
-
+                isDead = True
                 #Restart Game In 5s
-
+                restartGame()
 
             if(Blaster.destroy):
                 del Blasters[index]
@@ -101,21 +150,29 @@ def updateDisplay():
 
         #Exits when song is done
         #if(not music.get_busy()): pygame.quit()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
-
+    
 
 lineCount = 1
 
 def onMusicBeat():
+    global diffuculty
+    global maxLineCount
+
+    if(isDead): return
     global lineCount
-    if(lineCount >= 3):
+    if(lineCount >= maxLineCount):
         newBlaster = gamecharacters.SQRBlasterAtPos(1280/2,720/2,plr.rect.x,plr.rect.y)
         Blasters.append(newBlaster)
+        if(diffuculty >= 2):
+            for i in range(diffuculty):
+                newBlaster = gamecharacters.SQRBlaster(1280/2,720/2)
+                Blasters.append(newBlaster)
         lineCount = 1
     else:
-        newBlaster = gamecharacters.SQRBlaster(1280/2,720/2)
-        Blasters.append(newBlaster)
+        for i in range(diffuculty):
+            newBlaster = gamecharacters.SQRBlaster(1280/2,720/2)
+            Blasters.append(newBlaster)
         lineCount += 1
