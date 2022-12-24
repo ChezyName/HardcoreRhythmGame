@@ -3,6 +3,11 @@ import os
 
 KEY_DEBUG = False
 
+def clamp(x,min,max):
+    if(x < min): return min
+    if(x > max): return max
+    return x
+
 class Player:
     def __init__(self,x,y):
         #Init
@@ -60,7 +65,10 @@ class Player:
             self.velX /= 2
             self.velY /= 2
 
-        self.x += self.velX
-        self.y += self.velY
+        X = self.x + self.velX
+        Y = self.y + self.velY
+
+        self.x = clamp(X,0,1280-32)
+        self.y = clamp(Y,0,720-32)
 
         self.rect = pygame.Rect(self.x,self.y,32,32)

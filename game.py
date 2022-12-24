@@ -38,7 +38,7 @@ def playGame():
     print("\n\n\nLoading Up Game Files...\n")
     pygame.init()
     pygame.display.set_caption("HardcoreRhythmGame")
-    #os.system('wmctrl -a HardcoreRhythmGame')
+    os.system('wmctrl -a HardcoreRhythmGame')
 
     global clock
     clock = pygame.time.Clock()
