@@ -3,6 +3,7 @@ import threading
 import time
 import sys,pygame
 import random
+import player
 
 window_width = 80
 window_height = 80
@@ -19,13 +20,7 @@ def loadBeatMap():
     
 
 def realGame():
-    #Load beatmap FIRST
-    loadBeatMap()
 
-    #Main Game Load Song
-    song = (os.path.join(Path,"song.wav"))
-    song_sound = pygame.mixer.Sound(song)
-    pygame.mixer.Sound.play(song_sound)
 
     TotalTime = 0
     num = 0
@@ -37,36 +32,65 @@ def realGame():
         #os.system('cls')
         #print("-> NOTE IS HERE @ " + str(t) + "/" + str(sleeptime) + "\n")
         #Note RN
-        drawShape()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit()
+        onMusicBeat()
 
 def playGame():
     print("\n\n\nLoading Up Game Files...\n")
     pygame.init()
     pygame.display.set_caption("HardcoreRhythmGame")
-    os.system('wmctrl -a HardcoreRhythmGame')
+    #os.system('wmctrl -a HardcoreRhythmGame')
+
+    global clock
+    clock = pygame.time.Clock()
+
+    #Create player
+    global plr
+    plr = player.Player(1280/2,720/2)
 
     size = width, height = 1280, 720
     global screen
     screen = pygame.display.set_mode(size)
     screen.fill((0,0,0))
     
+    loadBeatMap()
 
-    #DisplayUpdater
-    threading.Thread(target=updateDisplay, args=(), daemon=True).start()
+    #Main Game Load Song
+    song = (os.path.join(Path,"song.wav"))
+    song_sound = pygame.mixer.Sound(song)
+    pygame.mixer.Sound.play(song_sound)
     
     print("Loaded game files, Starting...")
-    realGame()
+    updateDisplay()
 
 def updateDisplay():
-    while True:
-        #print("Updating @ ")
-        pygame.display.update()
+    StartTime = time.time()
+    nextBeat = 0
 
-def drawShape():
+    while True:
+        TimeElapsed = time.time() - StartTime
+        BeatTime = BeatMapData[nextBeat] - TimeElapsed
+        if(nextBeat < 0):
+            nextBeat += 1
+            onMusicBeat()
+
+        #print("Time Elapsed: " + str(TimeElapsed) + " : Beat Timings " + str(nextBeat) +":"+ str(BeatTime))
+
+
+        screen.fill((0,0,0))
+        plr.update()
+        plr.draw(screen)
+        pygame.display.update()
+        pygame.display.flip()
+        clock.tick()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+
+def onMusicBeat():
     screen.fill((0,0,0))
+    '''
     CIRCLEPOS = (random.randint(0,1280), random.randint(0,720)) 
     CIRCLEPOS = (1280/2,720/2)
-    C = pygame.draw.circle(screen,(random.randint(80,255),random.randint(80,255),random.randint(80,255)),CIRCLEPOS,100000,100000)
+    C = pygame.draw.circle(screen,(random.randint(80,255),random.randint(80,255),random.randint(80,255)),CIRCLEPOS,250,2500)
+    '''
