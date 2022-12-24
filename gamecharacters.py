@@ -19,12 +19,14 @@ class Player:
         self.color = (255,255,255)
         self.velX = 0
         self.velY = 0
-        self.speed = 0.45
+        self.speed = 6
         #Movement Buttons
         self.left = False
         self.right = False
         self.up = False
         self.down = False
+        self.dead = False
+        self.start = time.time()
 
 
     def draw(self,win):
@@ -35,11 +37,17 @@ class Player:
         self.velY = 0
 
         #Key Pressess
-        KEYS = pygame.key.get_pressed()
-        self.up = KEYS[pygame.K_UP] or KEYS[pygame.K_w]
-        self.down = KEYS[pygame.K_DOWN] or KEYS[pygame.K_s]
-        self.left = KEYS[pygame.K_LEFT] or KEYS[pygame.K_a]
-        self.right = KEYS[pygame.K_RIGHT] or KEYS[pygame.K_d]
+        if(not self.dead):
+            KEYS = pygame.key.get_pressed()
+            self.up = KEYS[pygame.K_UP] or KEYS[pygame.K_w]
+            self.down = KEYS[pygame.K_DOWN] or KEYS[pygame.K_s]
+            self.left = KEYS[pygame.K_LEFT] or KEYS[pygame.K_a]
+            self.right = KEYS[pygame.K_RIGHT] or KEYS[pygame.K_d]
+        else:
+            self.up = False
+            self.down = False
+            self.right = False
+            self.left = False
 
         if(KEY_DEBUG):
             os.system('cls')
@@ -75,48 +83,103 @@ class Player:
 
         self.rect = pygame.Rect(self.x,self.y,32,32)
 
-class Blaster():
+class SQRBlaster():
     def __init__(self,centerPosX,centerPosY):
-        StartX = random.randrange(0,centerPosX*2)
-        StartY = random.randrange(centerPosY,centerPosY*2)
+        self.Width = 0
+        self.Height = 0
+        X = 0
+        Y = 0
+        self.XorY = bool(random.getrandbits(1))
 
-        EndX = random.randrange(0,centerPosX*2)
-        EndY = random.randrange(-(centerPosY*2),centerPosY)
+        if(self.XorY):
+            #X Mode
+            self.Width = 15
+            self.Height = 10000
+            X = random.randrange(0,centerPosX*2)
+            Y = 0
+        else:
+            #Y Mode
+            self.Width = 10000
+            self.Height = 15
+            X = 0
+            Y = random.randrange(0,centerPosY*2)
 
-        if(StartX > centerPosX): StartX += 500
-        else: StartX -= 500
-
-        if(StartY > centerPosY): StartY += 500
-        else: StartY -= 500
-
-        if(EndX > centerPosX): EndX += 500
-        else: EndX -= 500
-
-        if(EndY > centerPosY): EndY += 500
-        else: EndY -= 500
-
-        if(StartX > centerPosX and EndX > centerPosX): EndX = -EndX
-        if(StartY > centerPosY and EndY > centerPosY): EndY = -EndY
-
-
-        self.startPos = pygame.Vector2(StartX,StartY)
-        self.endPos = pygame.Vector2(EndX,EndY)
-        self.thickness = 1
         self.start = time.time()
-
-        ''' DEBUG MODE
-        print("Start:")
-        print(str(self.startPos))
-        print("End:")
-        print(str(self.endPos))
-        '''
+        self.die = False
+        self.destroy = False
+        self.X = X
+        self.Y = Y
+        self.rect = pygame.Rect(X,Y,self.Width,self.Height)
+        self.color = (0,0,0)
+        self.alpha = 0
         
     
     def draw(self,win):
         timeElapsed = time.time() - self.start
 
-        if(not(timeElapsed >= 0.45)):
-            self.thickness = int(80*(timeElapsed/1.2))
+        if(not(timeElapsed >= 1.4)):
+            #Transparency
+            self.alpha = 128*(timeElapsed/1.4)
+        else:
+            self.die = True
 
-        if(timeElapsed <= 0.5):
-            pygame.draw.line(win,(255,80,80),self.startPos,self.endPos,self.thickness)
+        if(timeElapsed <= 1.45):
+            self.rect = pygame.Rect(self.X,self.Y,self.Width,self.Height)
+            s = pygame.Surface((self.Width,self.Height))
+            s.set_alpha(self.alpha)
+            if(self.die): s.fill((255,0,0))
+            else: s.fill((0,255,0))
+            win.blit(s, (self.X,self.Y))
+        else:
+            self.destroy = True
+
+
+class SQRBlasterAtPos():
+    def __init__(self,centerPosX,centerPosY,PlayerPosX,PlayerPosY):
+        self.Width = 0
+        self.Height = 0
+        X = 0
+        Y = 0
+        self.XorY = bool(random.getrandbits(1))
+
+        if(self.XorY):
+            #X Mode
+            self.Width = 15
+            self.Height = 10000
+            X = PlayerPosX
+            Y = 0
+        else:
+            #Y Mode
+            self.Width = 10000
+            self.Height = 15
+            X = 0
+            Y = PlayerPosY
+
+        self.start = time.time()
+        self.die = False
+        self.destroy = False
+        self.X = X
+        self.Y = Y
+        self.rect = pygame.Rect(self.X,self.Y,self.Width,self.Height)
+        self.color = (0,0,0)
+        self.alpha = 0
+        
+    
+    def draw(self,win):
+        timeElapsed = time.time() - self.start
+
+        if(not(timeElapsed >= 1.4)):
+            #Transparency
+            self.alpha = 128*(timeElapsed/1.4)
+        else:
+            self.die = True
+
+        if(timeElapsed <= 1.45):
+            self.rect = pygame.Rect(self.X,self.Y,self.Width,self.Height)
+            s = pygame.Surface((self.Width,self.Height))
+            s.set_alpha(self.alpha)
+            if(self.die): s.fill((255,0,0))
+            else: s.fill((0,255,0))
+            win.blit(s, (self.X,self.Y))
+        else:
+            self.destroy = True

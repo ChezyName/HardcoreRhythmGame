@@ -25,6 +25,10 @@ def playGame():
     pygame.display.set_caption("HardcoreRhythmGame")
     os.system('wmctrl -a HardcoreRhythmGame')
 
+    pygame.font.init()
+    global FONT
+    FONT = pygame.font.SysFont(None, 24)
+
     global clock
     clock = pygame.time.Clock()
 
@@ -32,7 +36,7 @@ def playGame():
     global plr
     plr = gamecharacters.Player(1280/2,720/2)
 
-    size = width, height = 720, 720
+    size = width, height = 1280, 720
     global screen
     screen = pygame.display.set_mode(size)
     screen.fill((0,0,0))
@@ -46,6 +50,8 @@ def playGame():
     music = pygame.mixer.Sound.play(song_sound)
     
     print("Loaded game files, Starting...")
+
+    #countdown
     updateDisplay()
 
 Blasters = []
@@ -69,12 +75,29 @@ def updateDisplay():
         plr.update()
         plr.draw(screen)
 
-        for Blaster in Blasters:
+        for index,Blaster in enumerate(Blasters):
             Blaster.draw(screen)
+
+
+            if(plr.rect.colliderect(Blaster.rect) and (time.time() - plr.start) > 2.5 and Blaster.die == True and Blaster.destroy == False):
+                #print("Player Has Died!")
+                plr.color = (255,0,0)
+                plr.dead = True
+
+                #Restart Game In 5s
+
+
+            if(Blaster.destroy):
+                del Blasters[index]
+
+
+        #Timer Text
+        Text = FONT.render("Survived "+str(int(TimeElapsed))+"s",True,(0,255,255))
+        screen.blit(Text,(0,0))
 
         pygame.display.update()
         pygame.display.flip()
-        clock.tick()
+        clock.tick(60)
 
         #Exits when song is done
         #if(not music.get_busy()): pygame.quit()
@@ -83,6 +106,16 @@ def updateDisplay():
             if event.type == pygame.QUIT:
                 exit()
 
+
+lineCount = 1
+
 def onMusicBeat():
-    newBlaster = gamecharacters.Blaster(1280/2,720/2)
-    Blasters.append(newBlaster)
+    global lineCount
+    if(lineCount >= 3):
+        newBlaster = gamecharacters.SQRBlasterAtPos(1280/2,720/2,plr.rect.x,plr.rect.y)
+        Blasters.append(newBlaster)
+        lineCount = 1
+    else:
+        newBlaster = gamecharacters.SQRBlaster(1280/2,720/2)
+        Blasters.append(newBlaster)
+        lineCount += 1
