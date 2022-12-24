@@ -1,5 +1,7 @@
 import sys,pygame
 import os
+import random
+import time
 
 KEY_DEBUG = False
 
@@ -17,7 +19,7 @@ class Player:
         self.color = (255,255,255)
         self.velX = 0
         self.velY = 0
-        self.speed = 0.65
+        self.speed = 0.45
         #Movement Buttons
         self.left = False
         self.right = False
@@ -72,3 +74,49 @@ class Player:
         self.y = clamp(Y,0,720-32)
 
         self.rect = pygame.Rect(self.x,self.y,32,32)
+
+class Blaster():
+    def __init__(self,centerPosX,centerPosY):
+        StartX = random.randrange(0,centerPosX*2)
+        StartY = random.randrange(centerPosY,centerPosY*2)
+
+        EndX = random.randrange(0,centerPosX*2)
+        EndY = random.randrange(-(centerPosY*2),centerPosY)
+
+        if(StartX > centerPosX): StartX += 500
+        else: StartX -= 500
+
+        if(StartY > centerPosY): StartY += 500
+        else: StartY -= 500
+
+        if(EndX > centerPosX): EndX += 500
+        else: EndX -= 500
+
+        if(EndY > centerPosY): EndY += 500
+        else: EndY -= 500
+
+        if(StartX > centerPosX and EndX > centerPosX): EndX = -EndX
+        if(StartY > centerPosY and EndY > centerPosY): EndY = -EndY
+
+
+        self.startPos = pygame.Vector2(StartX,StartY)
+        self.endPos = pygame.Vector2(EndX,EndY)
+        self.thickness = 1
+        self.start = time.time()
+
+        ''' DEBUG MODE
+        print("Start:")
+        print(str(self.startPos))
+        print("End:")
+        print(str(self.endPos))
+        '''
+        
+    
+    def draw(self,win):
+        timeElapsed = time.time() - self.start
+
+        if(not(timeElapsed >= 0.45)):
+            self.thickness = int(80*(timeElapsed/1.2))
+
+        if(timeElapsed <= 0.5):
+            pygame.draw.line(win,(255,80,80),self.startPos,self.endPos,self.thickness)

@@ -32,7 +32,7 @@ def playGame():
     global plr
     plr = gamecharacters.Player(1280/2,720/2)
 
-    size = width, height = 1280, 720
+    size = width, height = 720, 720
     global screen
     screen = pygame.display.set_mode(size)
     screen.fill((0,0,0))
@@ -48,7 +48,7 @@ def playGame():
     print("Loaded game files, Starting...")
     updateDisplay()
 
-Entities = []
+Blasters = []
 
 def updateDisplay():
     StartTime = time.time()
@@ -69,6 +69,9 @@ def updateDisplay():
         plr.update()
         plr.draw(screen)
 
+        for Blaster in Blasters:
+            Blaster.draw(screen)
+
         pygame.display.update()
         pygame.display.flip()
         clock.tick()
@@ -81,4 +84,5 @@ def updateDisplay():
                 exit()
 
 def onMusicBeat():
-    print("BEAT NOW!")
+    newBlaster = gamecharacters.Blaster(1280/2,720/2)
+    Blasters.append(newBlaster)
