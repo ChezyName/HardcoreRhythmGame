@@ -27,6 +27,7 @@ def get_onset_times(file_path):
     
     return onset_times
 
+    
 def generateBeatmap(path):
     if os.path.isdir(path):
         files = [os.path.join(path, file) for file in os.listdir(path) if not file.startswith('.')]

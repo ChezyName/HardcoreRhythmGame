@@ -1,11 +1,8 @@
 import os
-from playsound import playsound
 import threading
 import time
-import subprocess
+import sys,pygame
 import random
-import tkinter as tk
-from tkinter.ttk import *
 
 window_width = 80
 window_height = 80
@@ -24,78 +21,52 @@ def loadBeatMap():
 def realGame():
     #Load beatmap FIRST
     loadBeatMap()
-    print("Ready To Play??")
 
     #Main Game Load Song
     song = (os.path.join(Path,"song.wav"))
-    threading.Thread(target=playsound, args=(song,), daemon=True).start()
+    song_sound = pygame.mixer.Sound(song)
+    pygame.mixer.Sound.play(song_sound)
 
-    global num
-    global TotalTime
+    TotalTime = 0
     num = 0
 
-    t = BeatMapData[num]
-    num += 1
-    TotalTime = 0
-    sleeptime = t - TotalTime
-    TotalTime += sleeptime
-    time.sleep(sleeptime)
-    mainW.newWindow()
-
-    '''
-    print(len(BeatMapData))
     for t in BeatMapData:
-        sleeptime = t - TotalTime
+        sleeptime = (t - TotalTime)
         TotalTime += sleeptime
-        time.sleep(sleeptime)
-        os.system('cls')
-        print("-> NOTE IS HERE @ " + str(t) + "/" + str(sleeptime) + "\n")
+        time.sleep(round(sleeptime,4))
+        #os.system('cls')
+        #print("-> NOTE IS HERE @ " + str(t) + "/" + str(sleeptime) + "\n")
         #Note RN
-        threading.Thread(target=mainW.newWindow(), args=(), daemon=True).start()
-    '''
+        drawShape()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
 
 def playGame():
-    root = tk.Tk()
-    global mainW
-    mainW = Example(root)
-    mainW.pack(side="top", fill="both", expand=True)
+    print("\n\n\nLoading Up Game Files...\n")
+    pygame.init()
+    pygame.display.set_caption("HardcoreRhythmGame")
+    os.system('wmctrl -a HardcoreRhythmGame')
 
-    root.after(0,realGame)
-    root.mainloop()
+    size = width, height = 1280, 720
+    global screen
+    screen = pygame.display.set_mode(size)
+    screen.fill((0,0,0))
+    
 
-def createNewWindowIn():
-    global num
-    global TotalTime
-    t = BeatMapData[num]
-    num += 1
-    sleeptime = t - TotalTime
-    TotalTime += sleeptime
-    time.sleep(sleeptime)
-    mainW.newWindow()
+    #DisplayUpdater
+    threading.Thread(target=updateDisplay, args=(), daemon=True).start()
+    
+    print("Loaded game files, Starting...")
+    realGame()
 
-class Example(tk.Frame):
-    def __init__(self, root):
-        tk.Frame.__init__(self, root)
-        self.count = 0
+def updateDisplay():
+    while True:
+        #print("Updating @ ")
+        pygame.display.update()
 
-    def newWindow(self):
-        self.count += 1
-        window = tk.Toplevel(self)
-        #Center Windowd
-        global screen_height, screen_width, x_cordinate, y_cordinate
-        screen_width = window.winfo_screenwidth()
-        screen_height = window.winfo_screenheight()
-
-        #random positioning
-        x_cordinate = random.randrange(0,(screen_width) - (window_width))
-        y_cordinate = random.randrange(0,(screen_height) - (window_height))
-
-        print("\n>Creating New Window")
-
-        window.geometry("{}x{}+{}+{}".format(window_width, window_height, x_cordinate, y_cordinate))
-        btn = tk.Button(window, text = 'HERE', bd = '5', command = window.destroy,width=1000,height=1000)
-        btn.pack(side = 'top') 
-
-        #Finish Init Window
-        window.resizable(False, False)
-        window.after(0,createNewWindowIn)
+def drawShape():
+    screen.fill((0,0,0))
+    CIRCLEPOS = (random.randint(0,1280), random.randint(0,720)) 
+    CIRCLEPOS = (1280/2,720/2)
+    C = pygame.draw.circle(screen,(random.randint(80,255),random.randint(80,255),random.randint(80,255)),CIRCLEPOS,100000,100000)
