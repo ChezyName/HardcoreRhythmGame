@@ -1,25 +1,54 @@
-import tkinter as tk
+import os, shutil
+from pytube import YouTube
+import aubio
+import generate_beatmap
+import subprocess
+import game
+    
+#Create Temp Folder
+Path = os.path.join(os.getcwd(),"Music")
+if not os.path.exists(Path): os.makedirs(Path)
 
-#Consts
-window_width = 780
-window_height = 500
+for filename in os.listdir(Path):
+    file_path = os.path.join(Path, filename)
+    try:
+        if os.path.isfile(file_path) or os.path.islink(file_path):
+            os.unlink(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+    except Exception as e:
+        print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
-#Create Main Window
-main = tk.Tk()
 
-#Center Windowd
-global screen_height, screen_width, x_cordinate, y_cordinate
 
-screen_width = main.winfo_screenwidth()
-screen_height = main.winfo_screenheight()
-    # Coordinates of the upper left corner of the window to make the window appear in the center
-x_cordinate = int((screen_width/2) - (window_width/2))
-y_cordinate = int((screen_height/2) - (window_height/2))
-main.geometry("{}x{}+{}+{}".format(window_width, window_height, x_cordinate, y_cordinate))
+print("Paste Song Link From YouTube")
+yt = YouTube(
+    str(input("Enter the URL of the video you want to download: \n>> ")))
+  
+# extract only audio
+video = yt.streams.filter(only_audio=True).first()
+  
+# check for destination to save file
+destination = Path
+  
+# download the file
+out_file = video.download(output_path=destination)
+  
+print(yt.title + " has been successfully downloaded.")
+print("\n\n")
 
-#Finish Init Window
-main.focus_force()
-main.mainloop()
+# save the file
+subprocess.run([
+    'ffmpeg',
+    '-i', os.path.join(Path, out_file),
+    os.path.join(Path, 'song.wav')
+])
 
-#File Pick State
+os.remove(out_file)
+
+# result of success
+print("Generating Beatmap...")
+
+generate_beatmap.generateBeatmap(os.path.join(Path,'song.wav'))
+game.playGame()
