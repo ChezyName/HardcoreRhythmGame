@@ -64,7 +64,10 @@ Once you extract the files, open `main.py`, If it closes as soon as it opens, yo
 You can download `Python` from the **Windows Store** or from the [Python website](https://www.python.org/), Either way download and install Python to make the project run.
 
 ### Downloading Packages
+<s>
 Open up the `terminal` or `cmd` to where the project folder is located. Run `pip install -r requirements.txt`. This will download every package inside the requirements.txt file.
+
+> No Longer Required, Packages Installed In Repo
 
 
 ## How To Play
