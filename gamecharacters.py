@@ -1,9 +1,9 @@
 # python-packages directory
+import os,sys
 import_dir = os.path.abspath('python-packages')
 sys.path.append(import_dir)
 
 import sys,pygame
-import os
 import random
 import time
 

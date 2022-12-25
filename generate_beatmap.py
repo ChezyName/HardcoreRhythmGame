@@ -1,9 +1,7 @@
 # python-packages directory
+import os,sys
 import_dir = os.path.abspath('python-packages')
 sys.path.append(import_dir)
-
-import os
-import sys
 from aubio import source, onset
 
 def get_onset_times(file_path):

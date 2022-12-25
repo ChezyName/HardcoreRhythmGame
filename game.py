@@ -1,8 +1,8 @@
 # python-packages directory
+import os,sys
 import_dir = os.path.abspath('python-packages')
 sys.path.append(import_dir)
 
-import os
 import threading
 import time
 import sys,pygame
