@@ -26,15 +26,17 @@ def playGame(d):
     if(d == 1):
         #Easy
         diffuculty = 1
-        maxLineCount = 4
+        maxLineCount = 6
     elif(d==2):
         #Med
-        diffuculty = 3
-        maxLineCount = 2
+        diffuculty = 2
+        maxLineCount = 4
     elif(d==3):
         #Hard
-        maxLineCount = 1
-        diffuculty = 5
+        maxLineCount = 3
+        diffuculty = 3
+
+    lineScore = 0
 
     print("\n\n\nLoading Up Game Files...\n")
     pygame.init()
@@ -75,6 +77,9 @@ def restartGame():
     global isDead
     global music
     global nextBeat
+    global lineScore
+
+    lineScore = 0
 
     for index,Blaster in enumerate(Blasters):
         del Blasters[index]
@@ -100,10 +105,12 @@ def restartGame():
 
 Blasters = []
 isDead = False
+lineScore = 0
 
 def updateDisplay():
     global StartTime
     global nextBeat
+    global lineScore
     StartTime = time.time()
     nextBeat = 0
     global isDead
@@ -143,6 +150,8 @@ def updateDisplay():
         #Timer Text
         Text = FONT.render("Survived "+str(int(TimeElapsed))+"s",True,(0,255,255))
         screen.blit(Text,(0,0))
+        Text = FONT.render("@ " + str(lineScore) + " Lines Dodged!",True,(0,255,255))
+        screen.blit(Text,(0,25))
 
         pygame.display.update()
         pygame.display.flip()
@@ -160,19 +169,19 @@ lineCount = 1
 def onMusicBeat():
     global diffuculty
     global maxLineCount
+    global lineScore
 
     if(isDead): return
     global lineCount
     if(lineCount >= maxLineCount):
         newBlaster = gamecharacters.SQRBlasterAtPos(1280/2,720/2,plr.rect.x,plr.rect.y)
         Blasters.append(newBlaster)
-        if(diffuculty >= 2):
-            for i in range(diffuculty):
-                newBlaster = gamecharacters.SQRBlaster(1280/2,720/2)
-                Blasters.append(newBlaster)
         lineCount = 1
+        lineScore += 1
     else:
         for i in range(diffuculty):
             newBlaster = gamecharacters.SQRBlaster(1280/2,720/2)
             Blasters.append(newBlaster)
+            lineScore += 1
         lineCount += 1
+        

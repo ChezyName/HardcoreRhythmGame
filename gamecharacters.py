@@ -120,13 +120,13 @@ class SQRBlaster():
     def draw(self,win):
         timeElapsed = time.time() - self.start
 
-        if(not(timeElapsed >= 0.6)):
+        if(not(timeElapsed >= 0.95)):
             #Transparency
-            self.alpha = 128*(timeElapsed/0.6)
+            self.alpha = 128*(timeElapsed/0.95)
         else:
             self.die = True
 
-        if(timeElapsed <= 0.65):
+        if(timeElapsed <= 1):
             self.rect = pygame.Rect(self.X,self.Y,self.Width,self.Height)
             s = pygame.Surface((self.Width,self.Height))
             s.set_alpha(self.alpha)
