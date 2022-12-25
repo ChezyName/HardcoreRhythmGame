@@ -1,3 +1,7 @@
+# python-packages directory
+import_dir = os.path.abspath('python-packages')
+sys.path.append(import_dir)
+
 import os
 import threading
 import time

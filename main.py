@@ -1,3 +1,7 @@
+# python-packages directory
+import_dir = os.path.abspath('python-packages')
+sys.path.append(import_dir)
+
 import os, shutil
 from pytube import YouTube
 import aubio
