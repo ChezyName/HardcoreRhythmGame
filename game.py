@@ -83,8 +83,8 @@ def restartGame():
     print("\n")
     print("======================================")
     print("Game Ended, Your Score:")
-    print(lineScore + " Lasers Dodged!")
-    print("Survived " + TimeElapsed + " Seconds!")
+    print(str(lineScore) + " Lasers Dodged!")
+    print("Survived " + str(TimeElapsed) + " Seconds!")
     print("======================================")
 
     lineScore = 0
