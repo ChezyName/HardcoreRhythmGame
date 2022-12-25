@@ -78,6 +78,14 @@ def restartGame():
     global music
     global nextBeat
     global lineScore
+    global TimeElapsed
+
+    print("\n")
+    print("======================================")
+    print("Game Ended, Your Score:")
+    print(lineScore + " Lasers Dodged!")
+    print("Survived " + TimeElapsed + " Seconds!")
+    print("======================================")
 
     lineScore = 0
 
@@ -111,6 +119,7 @@ def updateDisplay():
     global StartTime
     global nextBeat
     global lineScore
+    global TimeElapsed
     StartTime = time.time()
     nextBeat = 0
     global isDead
