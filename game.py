@@ -8,10 +8,8 @@ import time
 import sys,pygame
 import random
 import gamecharacters
-
 window_width = 80
 window_height = 80
-
 #Consts
 Path = os.path.join(os.getcwd(),"Music")
 BeatMapData = []
@@ -24,6 +22,8 @@ def loadBeatMap():
     
 
 def playGame(d):
+
+
     global diffuculty
     global maxLineCount
     
@@ -39,6 +39,17 @@ def playGame(d):
         #Hard
         maxLineCount = 3
         diffuculty = 3
+    elif(d==4):
+
+        maxLineCount = 2
+        diffuculty = 4
+    elif(d==5):
+
+        maxLineCount = 1
+        diffuculty = 5
+    elif(d==6):
+        maxLineCount = 1
+        diffuculty = 6
 
     lineScore = 0
 
@@ -83,7 +94,7 @@ def restartGame():
     global nextBeat
     global lineScore
     global TimeElapsed
-
+    global boost_cooldown
     print("\n")
     print("======================================")
     print("Game Ended, Your Score:")
@@ -124,13 +135,66 @@ def updateDisplay():
     global nextBeat
     global lineScore
     global TimeElapsed
+    life = 0
+    #gamecharacterss = gamecharacters.Player()
+    #boost_cooldown = gamecharacterss.boost_cooldown
+
+
     StartTime = time.time()
     nextBeat = 0
     global isDead
+        #Clean Screen window_background_color, shape_color, warning_zone, red_zone
+    def get_value_from_file(search_item):
+        with open('tmp.txt', 'r') as file:
+            for line in file:
+                if line.startswith(f'{search_item}:'):
+                    value_str = line.split(': ')[1]
+                    value = tuple(map(int, value_str.strip('()\n').split(', ')))
+                    return value
+
+    search_item = "window_background_color"
+    sereen_value = get_value_from_file(search_item)
+    search_item = "shape_color"
+    shape_color = get_value_from_file(search_item)
+    def interpolate_colors(color1, color2, steps):
+        # Extract the RGB components of the two colors
+        r1, g1, b1 = color1
+        r2, g2, b2 = color2
+
+        # Calculate the step size for each component
+        step_r = (r2 - r1) / (steps + 1)
+        step_g = (g2 - g1) / (steps + 1)
+        step_b = (b2 - b1) / (steps + 1)
+
+        # Initialize a list to store the interpolated colors
+        interpolated_colors = []
+
+        # Generate the interpolated colors
+        for i in range(steps):
+            r = int(r1 + step_r * (i + 1))
+            g = int(g1 + step_g * (i + 1))
+            b = int(b1 + step_b * (i + 1))
+            interpolated_colors.append((r, g, b))
+
+        return interpolated_colors
+
+    color1 = shape_color
+    color2 = (255, 0, 0)  # Red
+    interpolated_colors = interpolate_colors(color1, color2, 4)
+
+
+    color_var1, color_var2, color_var3, color_var4= interpolated_colors
+
+    # Access the individual colors
+    print("Color 1:", color_var1)
+    print("Color 2:", color_var2)
+    print("Color 3:", color_var3)
+    print("Color 4:", color_var4)
+
 
     while True:
-        #Clean Screen
-        screen.fill((0,0,0))
+
+        screen.fill((sereen_value))
 
         if(not isDead):
             TimeElapsed = time.time() - StartTime
@@ -149,23 +213,57 @@ def updateDisplay():
 
 
             if(plr.rect.colliderect(Blaster.rect) and (time.time() - plr.start) > 2.5 and Blaster.die == True and Blaster.destroy == False):
-                #print("Player Has Died!")
-                plr.color = (255,0,0)
-                plr.dead = True
-                isDead = True
-                #Restart Game In 5s
-                restartGame()
 
-            if(Blaster.destroy):
-                del Blasters[index]
+                if life == 1:
+                    plr.color = color_var1
+                    pygame.time.delay(100)
+                if life == 2:
+                    plr.color = color_var3
+                    pygame.time.delay(100)
+                if life == 3:
+                    plr.color = color_var3
+                    pygame.time.delay(100)
+                if life == 4:
+                    plr.color = color_var4
+                    pygame.time.delay(100)
+                if life == 5:
+                    plr.color = color_var4
+                    pygame.time.delay(100)
+                if life == 6:
+                    plr.color = color2
+                    plr.dead = True
+                    isDead = True
+                    #Restart Game In 5s
+                    #print("Player Has Died!")
+                    life = 0
+
+                    pygame.time.delay(3000)
+                    restartGame()
+
+                    if(Blaster.destroy):
+                        del Blasters[index]
+
+                life = life + 1
+
+        '''
+        boost_cooldown = 5
+        last_boost_time = 0
 
 
+        current_time = time.time()
+        KEYS = {}
+
+        if KEYS[pygame.K_SPACE]:
+            if current_time - last_boost_time >= boost_cooldown:
+                last_boost_time = current_time
+        '''
         #Timer Text
         Text = FONT.render("Survived "+str(int(TimeElapsed))+"s",True,(0,255,255))
         screen.blit(Text,(0,0))
         Text = FONT.render("@ " + str(lineScore) + " Lines Dodged!",True,(0,255,255))
         screen.blit(Text,(0,25))
-
+        #Text = FONT.render("! " + str(boost_cooldown) + str(current_time) + str(last_boost_time) + " boost_cooldown",True,(0,255,255))
+        screen.blit(Text,(0,50))
         pygame.display.update()
         pygame.display.flip()
         clock.tick(60)
